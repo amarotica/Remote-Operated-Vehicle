@@ -1,7 +1,7 @@
 //-------Written by Taylor Amarotico-------//
 // Remote Operated Vehicle Transmitter //
 
-char SoftwareVersion = "v1.1";
+char SoftwareVersion = "v1.01";
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -68,7 +68,7 @@ int JSAYtransmit = 0;
 void setup()
 {
   
-// Debugging and transmission //
+// Debugging //
   Serial.begin(9600);
   Serial.println("System Initializing");
   delay(500);

@@ -2,7 +2,8 @@
 // Remote Operated Vehicle Receiver //
 
 
-char SoftwareVersion = "v1.1";
+char SoftwareVersion = "v1.01";
+
 #include <LoRaLib.h>
 
 SX1276 lora = new LoRa;
@@ -10,44 +11,136 @@ SX1276 lora = new LoRa;
 
 
 
-
-  byte transmissionArray{12};
-// byte transmissionArray[] = {Rmotor, Lmotor, Rdirection, Ldirection, Ebrakeinput, Lightinput, Highbeaminput, JSAXtransmit, JSAYtransmit, JSBinput, JSABinput, 23};
-  int Rmotor = transmissionArray{1};
-  int Lmotor = transmissionArray{2};
-  int Rdirection = transmissionArray{3};
-  int Ldirection = transmissionArray{4};  
-  int Ebrakeinput = transmissionArray{5};
-  int Lightinput = transmissionArray{6};
-  int Highbeaminput = transmissionArray{7};
-  int JSAXtransmit = transmissionArray{8};
-  int JSAYtransmit = transmissionArray{9};
-  int JSBinput = transmissionArray{10};
-  int JSABinput = transmissionArray{11};
-
-
-
+// transmissionArray Variable Inputs Declaration //
+  byte transmissionArray[12];
+  int Rmotorvalue = transmissionArray[1];
+  int Lmotorvalue = transmissionArray[2];
+  int Rdirectionvalue = transmissionArray[3];
+  int Ldirectionvalue = transmissionArray[4];  
+  int Ebrakevalue = transmissionArray[5];
+  int Lightsvalue = transmissionArray[6];
+  int Highbeamsvalue = transmissionArray[7];
+  int JSAXvalue = transmissionArray[8];
+  int JSAYvalue = transmissionArray[9];
+  int JSBvalue = transmissionArray[10];
+  int JSABvalue = transmissionArray[11];
+  int VerificationValue = transmissionArray[12];
+  
+// Pin and Constant Declaration //
+  const int Rmotor = 2;
+  const int Lmotor = 3;
+  const int Rdirection = 4;
+  const int Ldirection = 5;
+  const int Ebrake = 12;
+  const int Lights = 6;
+  const int Highbeams = 7;
+  const int JSAX = 8;
+  const int JSAY = 9;
+  const int JSB = 10;
+  const int JSAB = 11;
+  
 void setup() {
-  Serial.begin(9600);
 
+// Debugging //
+  Serial.begin(9600);
+  Serial.println("System Initializing");
+  delay(500);
+  Serial.print(".");
+  delay(500);
+  Serial.print(".");
+  delay(500);
+  Serial.println(".");
+  delay(500);
+  Serial.println(SoftwareVersion);
+  delay(250);
+
+// Output Setup //
+  pinMode(Rmotor, OUTPUT);
+  pinMode(Lmotor, OUTPUT);
+  pinMode(Rdirection, OUTPUT);
+  pinMode(Ldirection, OUTPUT);
+  pinMode(Ebrake, OUTPUT);
+  pinMode(Lights, OUTPUT);
+  pinMode(Highbeams, OUTPUT);
+  pinMode(JSAX, OUTPUT);
+  pinMode(JSAY, OUTPUT);
+  pinMode(JSB, OUTPUT);
+  pinMode(JSAB, OUTPUT);
+  Serial.println("Outputs Initialized");
+  delay(250);
+// Safe Initialize //
+  analogWrite(Rmotor, 0);
+  analogWrite(Lmotor, 0);
+  digitalWrite(Rdirection, 0);
+  digitalWrite(Ldirection, 0);
+  digitalWrite(Ebrake, 0);
+  digitalWrite(Lights, 0);
+  digitalWrite(Highbeams, 0);
+  analogWrite(JSAX, 0);
+  analogWrite(JSAY, 0);
+  digitalWrite(JSB, 0);
+  digitalWrite(JSAB, 0);
+  Serial.println("Safe Output Initialized");
+  delay(250);
+  
+// LoRa Setup //
   Serial.print(F("LoRa Initializing... "));
   byte state = lora.begin();
   if (state == ERR_NONE) {
     Serial.println(F("LoRa Initialized!"));
+    Serial.println("System Initialized...");
   } else {
     Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
+    Serial.println("Controls may not work");
     while (true);
   }
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
+  receiverModule();
+
+  enableModule();
+  
 }
 
-void receiverModule() {
+
+void enableModule() {       // This module tests to see if emergency brake is tripped and if so, disables actions and writes motors to 0/255 duty cycle
+
+  if (Ebrakevalue == 1){
+    analogWrite(Rmotor, 0);
+    analogWrite(Lmotor, 0);
+    digitalWrite(Ebrake, HIGH);
+    delay(1000);
+  }
+  else {
+    actionsModule();
+  }
+  
+//----------------------End of enableModule function----------------------//
+}
+
+void actionsModule() {        // This module writes motor and accesory values to output pins via PWM and digital on/off
+  
+  analogWrite(Rmotor, Rmotorvalue);
+  analogWrite(Lmotor, Lmotorvalue);
+  digitalWrite(Rdirection, Rdirectionvalue);
+  digitalWrite(Ldirection, Ldirectionvalue);
+  digitalWrite(Lights, Lightsvalue);
+  digitalWrite(Highbeams, Highbeamsvalue);
+  analogWrite(JSAX, JSAXvalue);
+  analogWrite(JSAY, JSAYvalue);
+  digitalWrite(JSB, JSBvalue);
+  digitalWrite(JSAB, JSABvalue);
+  
+//----------------------End of actionsModule function----------------------//
+}
+
+
+
+void receiverModule() {       // This module takes in the data from the LoRa module and converts it into useable values for the enableModule and actionsModule
 
   byte state = lora.receive(transmissionArray, 12);
   
@@ -57,8 +150,8 @@ void receiverModule() {
 
     // print data of the packet
     Serial.print("Data:\t\t");
-    Serial.println(transmissionArray);
-
+//    Serial.println(transmissionArray); 
+    
     // print measured data rate
     Serial.print("Datarate:\t");
     Serial.print(lora.dataRate);
@@ -83,8 +176,8 @@ void receiverModule() {
   } else if (state == ERR_CRC_MISMATCH) {
     // packet was received, but is malformed
     Serial.println("CRC error!");
-
+    
   }
-  
+//----------------------End of receiverModule function----------------------//
 }
 
