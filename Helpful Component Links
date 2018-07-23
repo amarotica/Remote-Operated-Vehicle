@@ -1,0 +1,6 @@
+I2C Multiplexer: https://learn.adafruit.com/adafruit-tca9548a-1-to-8-i2c-multiplexer-breakout/wiring-and-test
+OLED I2C Examples: https://learn.adafruit.com/monochrome-oled-breakouts/arduino-library-and-examples
+
+LoRa Transmit Example: https://github.com/jgromes/LoRaLib/blob/master/examples/Transmit/Transmit.ino
+LoRa Receive Example: https://github.com/jgromes/LoRaLib/blob/master/examples/Receive/Receive.ino
+LoRa Random Link: https://quadmeup.com/hands-on-e45-ttl-100-868mhz-lora-wireless-modules/
