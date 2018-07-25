@@ -127,38 +127,6 @@ void receiverModule() {       // This module takes in the data from the LoRa mod
 
   byte state = lora.receive(transmissionArray, 12);
   
-  if (state == ERR_NONE) {
-    // packet was successfully received
-    Serial.println("success!");
-
-    // print data of the packet
-    Serial.print("Data:\t\t");
-//    Serial.println(transmissionArray); 
-    
-    // print measured data rate
-    Serial.print("Datarate:\t");
-    Serial.print(lora.dataRate);
-    Serial.println(" bps");
-
-    // print RSSI (Received Signal Strength Indicator) 
-    // of the last received packet
-    Serial.print("RSSI:\t\t");
-    Serial.print(lora.lastPacketRSSI);
-    Serial.println(" dBm");
-
-    // print SNR (Signal-to-Noise Ratio) 
-    // of the last received packet
-    Serial.print("SNR:\t\t");
-    Serial.print(lora.lastPacketSNR);
-    Serial.println(" dBm");
-
-  } else if (state == ERR_RX_TIMEOUT) {
-    // timeout occurred while waiting for a packet
-    Serial.println("timeout!");
-
-  } else if (state == ERR_CRC_MISMATCH) {
-    // packet was received, but is malformed
-    Serial.println("CRC error!");
     
   }
 //----------------------End of receiverModule function----------------------//
