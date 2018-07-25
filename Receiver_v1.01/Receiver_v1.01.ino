@@ -4,11 +4,6 @@
 
 char SoftwareVersion = "v1.01";
 
-#include <LoRaLib.h>
-
-SX1276 lora = new LoRa;
-
-
 
 
 // transmissionArray Variable Inputs Declaration //
@@ -41,6 +36,7 @@ SX1276 lora = new LoRa;
   
 void setup() {
 
+/* // Only used when debugging.
 // Debugging //
   Serial.begin(9600);
   Serial.println("System Initializing");
@@ -53,7 +49,7 @@ void setup() {
   delay(500);
   Serial.println(SoftwareVersion);
   delay(250);
-
+*/
 // Output Setup //
   pinMode(Rmotor, OUTPUT);
   pinMode(Lmotor, OUTPUT);
@@ -66,7 +62,7 @@ void setup() {
   pinMode(JSAY, OUTPUT);
   pinMode(JSB, OUTPUT);
   pinMode(JSAB, OUTPUT);
-  Serial.println("Outputs Initialized");
+//  Serial.println("Outputs Initialized");
   delay(250);
 // Safe Initialize //
   analogWrite(Rmotor, 0);
@@ -80,22 +76,9 @@ void setup() {
   analogWrite(JSAY, 0);
   digitalWrite(JSB, 0);
   digitalWrite(JSAB, 0);
-  Serial.println("Safe Output Initialized");
+//  Serial.println("Safe Output Initialized");
   delay(250);
   
-// LoRa Setup //
-  Serial.print(F("LoRa Initializing... "));
-  byte state = lora.begin();
-  if (state == ERR_NONE) {
-    Serial.println(F("LoRa Initialized!"));
-    Serial.println("System Initialized...");
-  } else {
-    Serial.print(F("failed, code 0x"));
-    Serial.println(state, HEX);
-    Serial.println("Controls may not work");
-    while (true);
-  }
-
 }
 
 void loop() {
