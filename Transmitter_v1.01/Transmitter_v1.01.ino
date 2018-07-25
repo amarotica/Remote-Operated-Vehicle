@@ -6,10 +6,6 @@ char SoftwareVersion = "v1.01";
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <LoRaLib.h>
-
-SX1276 lora = new LoRa;
-
 
 // Pin and Constant Declaration //
   const int JSX = A3; //Joystick pin
@@ -67,9 +63,10 @@ int JSAYtransmit = 0;
 
 void setup()
 {
-  
-// Debugging //
   Serial.begin(9600);
+/*  For debugging only
+// Debugging //
+
   Serial.println("System Initializing");
   delay(500);
   Serial.print(".");
@@ -80,7 +77,7 @@ void setup()
   delay(500);
   Serial.println(SoftwareVersion);
   delay(250);
-
+*/
 // Input Setup //
   pinMode(JSX, INPUT); //Analog
   pinMode(JSY, INPUT); //Analog
@@ -94,7 +91,7 @@ void setup()
   pinMode(ActionEnable, INPUT); //Digital
   pinMode(SpeedLimitSwitch, INPUT); //Digital
 
-  Serial.println("Inputs Initialized...");
+//  Serial.println("Inputs Initialized...");
   delay(250);
   
 // Output Setup //
@@ -104,21 +101,8 @@ void setup()
   pinMode(SpeedLED, OUTPUT);
   pinMode(StatusLED, OUTPUT);
 
-  Serial.println("Outputs Initialized...");
+//  Serial.println("Outputs Initialized...");
    delay(250);
-
-// LoRa Setup //
-  Serial.print(F("LoRa Initializing"));
-  byte state = lora.begin();
-  if (state == ERR_NONE) {
-    Serial.println(F("LoRa Initialized..."));
-    Serial.println("System Initialized...");
-  } else {
-    Serial.print(F("LoRa failed, code 0x"));
-    Serial.println(state, HEX);
-    Serial.println("Controls may not work");
-    while (true);
-  }
 
 }
 
@@ -128,7 +112,7 @@ void loop()
 
   indicatorsModule(); //All the LED indicators are handled through this function
 
-  transmissionModule(); //Packs all the data into an array and transmits through LoRa module
+  transmissionModule(); //Packs all the data into an array and transmits through Serial LoRa module
 
   displaysModule(); //Takes stored data from inputs module and system info, and prints important data to four I2C OLED displays via an I2C multiplexer
 
@@ -150,19 +134,7 @@ void transmissionModule()
   // Maybe if it can't be sent as an array, it could be sent individually and each thing have an identifier and on the receiver it can run individual functions based on type of value was received
   
   byte state = lora.transmit(transmissionArray, 12);
-
-  if ((state == ERR_NONE) && (Counter == 0)) {
-    Serial.println("Control Packet Sent!");
-  }  else if (state == ERR_PACKET_TOO_LONG) {
-    // the supplied packet was longer than 256 bytes
-    Serial.println(" too long!");
-
-  } else if (state == ERR_TX_TIMEOUT) {
-    // timeout occurred while transmitting packet
-    Serial.println(" timeout!");
-
-  } // I am going to try and test this entire section of the code tonight. Just to make sure my array will send via the LoRa serial module. If it doesn't work, I am going to need help with it
-
+//create transmission here//
   //----------------------End of transmissionModule function----------------------//
 }
 
@@ -218,7 +190,7 @@ SpeedLimit = map(SpeedLimitinput,0,1,SpeedLimitLow,SpeedLimitHigh);
   Rmotor = abs(R);
   Lmotor = abs(L);
 
-
+/*
 // Debugging //
   Serial.print("Right Motor Speed: ");
   Serial.println(Rmotor);
@@ -229,8 +201,7 @@ SpeedLimit = map(SpeedLimitinput,0,1,SpeedLimitLow,SpeedLimitHigh);
   Serial.println(Lmotor);
   Serial.print("Direction: ");
   Serial.println(Ldirection);  
-
-  delay(10);
+*/
   
 //----------------------End of motorcalculationModule function----------------------//
 }
@@ -253,11 +224,11 @@ void indicatorsModule()
 
   if ((ControllerStatus == 1) && (Counter == 0)){
     digitalWrite(StatusLED, HIGH);
-    Serial.println("Controller Status: OK!");
+//    Serial.println("Controller Status: OK!");
   }
   if ((ControllerStatus == 0)  && (Counter == 0)){
     digitalWrite(StatusLED, LOW);
-    Serial.println("Controller Status: ERROR");
+//    Serial.println("Controller Status: ERROR");
   }
   if (Counter == 20){
     Counter = 0;
