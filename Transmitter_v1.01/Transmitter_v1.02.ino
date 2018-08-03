@@ -1,11 +1,7 @@
 //-------Written by Taylor Amarotico-------//
 // Remote Operated Vehicle Transmitter //
 
-char SoftwareVersion = "v1.01";
-
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+char SoftwareVersion = "v1.02";
 
 // Pin and Constant Declaration //
   const int JSX = A3; //Joystick pin
@@ -63,7 +59,7 @@ int JSAYtransmit = 0;
 
 void setup()
 {
-  Serial.begin(9600);
+//  Serial.begin(9600);
 /*  For debugging only
 // Debugging //
 
@@ -92,7 +88,7 @@ void setup()
   pinMode(SpeedLimitSwitch, INPUT); //Digital
 
 //  Serial.println("Inputs Initialized...");
-  delay(250);
+  delay(50);
   
 // Output Setup //
   pinMode(BrakeStatusLED, OUTPUT);
@@ -102,7 +98,7 @@ void setup()
   pinMode(StatusLED, OUTPUT);
 
 //  Serial.println("Outputs Initialized...");
-   delay(250);
+   delay(50);
 
 }
 
@@ -114,27 +110,24 @@ void loop()
 
   transmissionModule(); //Packs all the data into an array and transmits through Serial LoRa module
 
-  displaysModule(); //Takes stored data from inputs module and system info, and prints important data to four I2C OLED displays via an I2C multiplexer
+//  displaysModule(); //Takes stored data from inputs module and system info, and prints important data to four I2C OLED displays via an I2C multiplexer
 
   ControllerStatus = 1;
 }
 
 
-
-
-
-
-
-
-
-
-void transmissionModule()
-{
+void transmissionModule() {
   byte transmissionArray[] = {Rmotor, Lmotor, Rdirection, Ldirection, Ebrakeinput, Lightinput, Highbeaminput, JSAXtransmit, JSAYtransmit, JSBinput, JSABinput, 23}; // I need to send these values to the receiver many times per second. Motor control is the most important to have sent very often but ideally everything sends many times per second
   // Maybe if it can't be sent as an array, it could be sent individually and each thing have an identifier and on the receiver it can run individual functions based on type of value was received
+
+  String dataStr = "";
+  dataStr = dataStr + Rmotor + "," + Lmotor + "," +  Rdirection + "," + Ldirection + "," +  Ebrakeinput + "," + Lightinput + "," + Highbeaminput + "," +  JSAXtransmit + "," +  JSAYtransmit + "," +  JSBinput + "," +  JSABinput + "," +  "23";
+  Serial.println(dataStr);
+  Serial.end();
+  delay(30);
+  Serial.begin(9600);
+  delay(70);
   
-  byte state = lora.transmit(transmissionArray, 12);
-//create transmission here//
   //----------------------End of transmissionModule function----------------------//
 }
 
@@ -142,8 +135,7 @@ void transmissionModule()
 
 
 
-void displaysModule()
-{
+//void displaysModule() {
 // This function utilizes two 128x32 I2C OLED displays and two 128x64 I2C OLED displays
 // The working library is at: https://github.com/adafruit/Adafruit_SSD1306/tree/master/ and The examples work. Even deleting unnecessary stuff from the examples and putting what I need in the code works for me.
 // It would be nice for all the displays to startup with the software version from the top of my code right after they initialize. 
@@ -153,14 +145,13 @@ void displaysModule()
 // Lmotorvalue   Rmotorvalue
 // The other two displays (the 128x64 displays) will just have filler text for now. Lets say they should say ("Hello World") in medium font size
 //----------------------End of displaysModule function----------------------//
-}
+//}
 
 
 
 
 
-void motorcalculationModule()
-{
+void motorcalculationModule() {
 // map values to usable values //
 JSXmapped = map(JSXinputvalue,0,1023,-255,255);
 JSYmapped = map(JSYinputvalue,0,1023,-255,255);
@@ -207,8 +198,7 @@ SpeedLimit = map(SpeedLimitinput,0,1,SpeedLimitLow,SpeedLimitHigh);
 }
 
 
-void indicatorsModule()
-{
+void indicatorsModule() {
   if (Ebrakeinput == 1) digitalWrite(BrakeStatusLED, HIGH);
   if (Ebrakeinput == 0) digitalWrite(BrakeStatusLED, LOW);
   
@@ -242,8 +232,7 @@ void indicatorsModule()
 
 
 
-void inputsModule()
-{
+void inputsModule() {
 JSXinputvalue = analogRead(JSX); //Joystick 1 input value
 JSYinputvalue = analogRead(JSY); //Joystick 1 input value
 JSAXinputvalue = analogRead(JSAX); //Joystick 2 input value
