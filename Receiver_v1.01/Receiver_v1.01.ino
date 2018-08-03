@@ -1,25 +1,24 @@
 //-------Written by Taylor Amarotico-------//
 // Remote Operated Vehicle Receiver //
 
-
-char SoftwareVersion = "v1.01";
-
-
+char SoftwareVersion = "v1.02";
 
 // transmissionArray Variable Inputs Declaration //
-  byte transmissionArray[12];
-  int Rmotorvalue = transmissionArray[1];
-  int Lmotorvalue = transmissionArray[2];
-  int Rdirectionvalue = transmissionArray[3];
-  int Ldirectionvalue = transmissionArray[4];  
-  int Ebrakevalue = transmissionArray[5];
-  int Lightsvalue = transmissionArray[6];
-  int Highbeamsvalue = transmissionArray[7];
-  int JSAXvalue = transmissionArray[8];
-  int JSAYvalue = transmissionArray[9];
-  int JSBvalue = transmissionArray[10];
-  int JSABvalue = transmissionArray[11];
-  int VerificationValue = transmissionArray[12];
+int transmissionArray[12];
+
+int Rmotorvalue = transmissionArray[1];
+int Lmotorvalue = transmissionArray[2];
+int Rdirectionvalue = transmissionArray[3];
+int Ldirectionvalue = transmissionArray[4];
+int Ebrakevalue = transmissionArray[5];
+int Lightsvalue = transmissionArray[6];
+int Highbeamsvalue = transmissionArray[7];
+int JSAXvalue = transmissionArray[8];
+int JSAYvalue = transmissionArray[9];
+int JSBvalue = transmissionArray[10];
+int JSABvalue = transmissionArray[11];
+int VerificationValue = transmissionArray[12];
+
   
 // Pin and Constant Declaration //
   const int Rmotor = 2;
@@ -63,7 +62,7 @@ void setup() {
   pinMode(JSB, OUTPUT);
   pinMode(JSAB, OUTPUT);
 //  Serial.println("Outputs Initialized");
-  delay(250);
+  delay(50);
 // Safe Initialize //
   analogWrite(Rmotor, 0);
   analogWrite(Lmotor, 0);
@@ -77,7 +76,7 @@ void setup() {
   digitalWrite(JSB, 0);
   digitalWrite(JSAB, 0);
 //  Serial.println("Safe Output Initialized");
-  delay(250);
+  delay(50);
   
 }
 
@@ -125,10 +124,33 @@ void actionsModule() {        // This module writes motor and accesory values to
 
 void receiverModule() {       // This module takes in the data from the LoRa module and converts it into useable values for the enableModule and actionsModule
 
-  byte state = lora.receive(transmissionArray, 12);
+  String str = "";
+  //String str ="1233,4146,7389,1511,21213,14315,16117,1819,2021,2223,2425,23";
   
-    
+  while (Serial.available() > 0) {
+    str += (char)Serial.read();
+    delay(5);
   }
-//----------------------End of receiverModule function----------------------//
-}
 
+  if (str != "") {
+    int indexArray[12];
+    indexArray[0]=str.indexOf(",");
+    for(int i=1;i<=10;i++){
+      indexArray[i]=str.indexOf(",",(indexArray[i-1] +1));
+      }
+      
+  
+transmissionArray[1]=str.substring(0,indexArray[0]).toInt();
+for(int i=2;i<=11;i++){
+  transmissionArray[i]=str.substring(indexArray[i-2]+1,indexArray[i-1]).toInt();
+  }
+transmissionArray[12]=str.substring(indexArray[10]+1).toInt();
+
+for(int i=1;i<=12;i++){
+  //Serial.println(transmissionArray[i]);
+  }
+  
+   // while(1);
+  }
+  //----------------------End of receiverModule function----------------------//
+}
